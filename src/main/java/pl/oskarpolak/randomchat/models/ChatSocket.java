@@ -96,7 +96,7 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
             return false;
         }
 
-        String[] commandArgs = message.getPayload().replace("/", "").split("\"");
+        String[] commandArgs = message.getPayload().replace("/", "").split(" ");
 
         MainCommand mainCommand;
         switch (commandArgs[0]) {
