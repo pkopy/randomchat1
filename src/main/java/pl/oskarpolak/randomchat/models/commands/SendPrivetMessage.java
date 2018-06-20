@@ -32,6 +32,6 @@ public class SendPrivetMessage extends MainCommand {
 
     @Override
     public String info() {
-        return "Use send <userName> <message>";
+        return "Use send (userName) (message)";
     }
 }

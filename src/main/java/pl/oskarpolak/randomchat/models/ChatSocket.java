@@ -28,7 +28,7 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry webSocketHandlerRegistry) {
         webSocketHandlerRegistry.addHandler(this, "/room")
-                                .setAllowedOrigins("*");
+                .setAllowedOrigins("*");
     }
 
     @Override
@@ -65,25 +65,25 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
         //Jesli prefix wiadomosci rozpoczyna sie od "nickname:"
         // to znaczy ze ktos chce ustawic nick
         //Przydaloby sie zrobic sprawdzanie czy nick jest wolny :)
-        if(message.getPayload().startsWith("nickname:")){
-            if(sender.getNickname() == null){
-                 sender.setNickname(message.getPayload().replace("nickname:", ""));
+        if (message.getPayload().startsWith("nickname:")) {
+            if (sender.getNickname() == null) {
+                sender.setNickname(message.getPayload().replace("nickname:", ""));
 
-                 sender.sendMessage(new TextMessage("Ustawiłeś swój nick"));
-                 sendMessageToAllWithoutSender(sender.getNickname() + ", dołączył do chatu", sender);
-            }else{
-                 sender.sendMessage(new TextMessage("Nie możesz zmienić nicku więcej razy!"));
+                sender.sendMessage(new TextMessage("Ustawiłeś swój nick"));
+                sendMessageToAllWithoutSender(sender.getNickname() + ", dołączył do chatu", sender);
+            } else {
+                sender.sendMessage(new TextMessage("Nie możesz zmienić nicku więcej razy!"));
             }
             return;
         }
 
         //Nie rozsyłaj wiadoomości usera ktory nie ma nicku
-        if(sender.getNickname() == null){
+        if (sender.getNickname() == null) {
             sender.sendMessage(new TextMessage("Najpierw ustal nick!"));
             return;
         }
 
-        if(isCommand(sender, message)){
+        if (isCommand(sender, message)) {
             return;
         }
 
@@ -92,13 +92,14 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
     }
 
     private boolean isCommand(UserModel sender, TextMessage message) {
-        if(!message.getPayload().startsWith("/")){
+        if (!message.getPayload().startsWith("/")) {
             return false;
         }
 
-        String[] commandArgs = message.getPayload().replace("/", "").split(" ");
+        String[] commandArgs = message.getPayload().replace("/", "").split("\"");
+
         MainCommand mainCommand;
-        switch (commandArgs[0]){
+        switch (commandArgs[0]) {
             case "kick": {
                 mainCommand = new KickCommand(userListService.getUserModels());
                 break;
@@ -112,7 +113,7 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
             }
         }
         try {
-            mainCommand.executeCommand(sender, Arrays.copyOfRange(commandArgs, 1,  commandArgs.length));
+            mainCommand.executeCommand(sender, Arrays.copyOfRange(commandArgs, 1, commandArgs.length));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -129,7 +130,7 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
         });
     }
 
-    private void sendMessageToAllWithoutSender(String message, UserModel sender){
+    private void sendMessageToAllWithoutSender(String message, UserModel sender) {
         userListService.getUserModels().stream()
                 .filter(s -> !s.equals(sender))
                 .forEach(s -> {
@@ -143,15 +144,15 @@ public class ChatSocket extends TextWebSocketHandler implements WebSocketConfigu
 
     //Funkcja szukajaca usera po sesji (pamietamy ze lista jest teraz lista UserModeli a nie sesji)
     //A w metodach wbudowanych w WebSocket przychodzi tylko sesja
-    private UserModel findBySession(WebSocketSession webSocketSession){
-         return  userListService.getUserModels().stream()
-                 .filter(s -> s.getUserSession().getId().equals(webSocketSession.getId()))
-                 .findAny()
-                 .orElseThrow(IllegalStateException::new);
+    private UserModel findBySession(WebSocketSession webSocketSession) {
+        return userListService.getUserModels().stream()
+                .filter(s -> s.getUserSession().getId().equals(webSocketSession.getId()))
+                .findAny()
+                .orElseThrow(IllegalStateException::new);
     }
 
-    private void addMessageToQue(String message){
-        if(lastTenMessages.size() >= 10){
+    private void addMessageToQue(String message) {
+        if (lastTenMessages.size() >= 10) {
             lastTenMessages.poll();
         }
 

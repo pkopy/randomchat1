@@ -26,7 +26,7 @@
     </div>
 
     <script type="text/javascript">
-        var websocketLink = "ws://localhost:8080/room";
+        var websocketLink = "ws://104.41.217.164:8080/room";
         var infoText = document.getElementById("info");
         var websocket = new WebSocket(websocketLink);
         var textArea = document.getElementById("messageArea");
@@ -41,7 +41,7 @@
         websocket.onmessage = function (ev) {
             console.log(ev.data)
             if(ev.data.startsWith('PM')){
-                messagesArea.innerHTML = messagesArea.innerHTML + "<li> <i>" + ev.data + "</i></li>";
+                messagesArea.innerHTML = messagesArea.innerHTML + "<li style='color: blue;'> <i>" + ev.data + "</i></li>";
 
             }else{
                 messagesArea.innerHTML = messagesArea.innerHTML + "<li>" + ev.data + "</li>";
